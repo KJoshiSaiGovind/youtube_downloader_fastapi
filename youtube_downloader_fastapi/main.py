@@ -1,54 +1,40 @@
 import os
-from fastapi import FastAPI, Form, Request
-from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
 import yt_dlp
+from fastapi import FastAPI, Form, Request
+from fastapi.responses import HTMLResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 
-# Create FastAPI app
-app = FastAPI(title="YouTube Downloader")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Templates folder
-templates = Jinja2Templates(directory="templates")
+app = FastAPI()
 
-# Downloads folder
-DOWNLOAD_DIR = os.path.join(os.getcwd(), "downloads")
+# Templates & Static
+templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
+app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static")
+
+DOWNLOAD_DIR = os.path.join(BASE_DIR, "downloads")
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
-# ---------------- API STATUS ROUTE ----------------
-@app.get("/api")
-def api_status():
-    return {"message": "YouTube Downloader API is running"}
-
-# ---------------- HOME PAGE (HTML FORM) ----------------
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
-# ---------------- DOWNLOAD ROUTE ----------------
-@app.post("/download", response_class=HTMLResponse)
-async def download_video(request: Request, url: str = Form(...)):
-    try:
-        ydl_opts = {
-            "outtmpl": os.path.join(DOWNLOAD_DIR, "%(title)s.%(ext)s"),
-            "format": "best"
-        }
+@app.post("/download")
+async def download(url: str = Form(...)):
+    output_path = os.path.join(DOWNLOAD_DIR, "video.%(ext)s")
 
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            ydl.download([url])
+    ydl_opts = {
+        "outtmpl": output_path,
+        "format": "best"
+    }
 
-        return templates.TemplateResponse(
-            "success.html",
-            {
-                "request": request,
-                "message": "Video downloaded successfully!"
-            }
-        )
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        info = ydl.extract_info(url, download=True)
+        filename = ydl.prepare_filename(info)
 
-    except Exception as e:
-        return templates.TemplateResponse(
-            "error.html",
-            {
-                "request": request,
-                "error": str(e)
-            }
-        )
+    return FileResponse(
+        filename,
+        media_type="application/octet-stream",
+        filename=os.path.basename(filename)
+    )
