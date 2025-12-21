@@ -1,3 +1,4 @@
+aiofiles
 annotated-types==0.7.0
 anyio==4.3.0
 argon2-cffi==23.1.0
@@ -107,3 +108,4 @@ websocket-client==1.7.0
 websockets==13.1
 Werkzeug==3.0.4
 yt-dlp==2024.10.7
+
