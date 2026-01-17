@@ -1,0 +1,13 @@
+__pycache__/
+downloads/
+debug_downloads/
+ffmpeg.exe
+ffprobe.exe
+ffmpeg.zip
+videos.db
+*.pyc
+.env
+.venv
+dist/
+build/
+*.egg-info/

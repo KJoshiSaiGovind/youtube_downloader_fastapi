@@ -1,0 +1,198 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&display=swap');
+
+:root {
+    --bg-color: #0f0f1a;
+    --card-bg: rgba(255, 255, 255, 0.05);
+    --primary-color: #ff0033;
+    --text-color: #ffffff;
+    --secondary-text: #a0a0ba;
+    --success: #00ff88;
+    --error: #ff3333;
+    --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body {
+    font-family: 'Outfit', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Initial center, will flow if content grows */
+    overflow-x: hidden;
+    background-image: 
+        radial-gradient(circle at 10% 20%, rgba(255, 0, 51, 0.1) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(50, 50, 255, 0.1) 0%, transparent 20%);
+}
+
+.main-container {
+    width: 90%;
+    max-width: 800px;
+    margin: 50px auto;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.glass-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: var(--glass-border);
+    border-radius: 24px;
+    padding: 40px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0;
+    background: linear-gradient(135deg, #fff 0%, #a5a5a5 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.input-group {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 18px 24px;
+    font-size: 1rem;
+    background: rgba(0, 0, 0, 0.2);
+    border: var(--glass-border);
+    border-radius: 12px;
+    color: #fff;
+    outline: none;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+input[type="text"]:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 15px rgba(255, 0, 51, 0.2);
+}
+
+.download-btn {
+    width: 100%;
+    padding: 18px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: white;
+    background: linear-gradient(45deg, #ff0033, #cc0029);
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.download-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(255, 0, 51, 0.4);
+}
+
+.download-btn:active {
+    transform: translateY(1px);
+}
+
+.loader {
+    display: none;
+    text-align: center;
+    margin-top: 20px;
+    color: var(--secondary-text);
+}
+
+/* History Section */
+.history-section h2 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    color: var(--text-color);
+}
+
+.video-list {
+    display: grid;
+    gap: 15px;
+}
+
+.video-item {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+}
+
+.video-item:hover {
+    border-color: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.video-info {
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+.video-title {
+    font-weight: 500;
+    margin-bottom: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.video-date {
+    font-size: 0.8rem;
+    color: var(--secondary-text);
+}
+
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-left: 15px;
+}
+
+.status-available {
+    background: rgba(0, 255, 136, 0.1);
+    color: var(--success);
+}
+
+.status-deleted {
+    background: rgba(255, 51, 51, 0.1);
+    color: var(--error);
+}
+
+/* Notification */
+.toast {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    padding: 15px 25px;
+    background: #1a1a2e;
+    border: var(--glass-border);
+    border-radius: 12px;
+    color: #fff;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.toast.show {
+    transform: translateY(0);
+    opacity: 1;
+}

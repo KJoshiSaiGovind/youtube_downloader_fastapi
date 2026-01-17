@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Downloader - Premium YouTube Saver</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="icon" type="image/png" href="https://img.icons8.com/color/48/youtube-play.png">
+</head>
+
+<body>
+
+    <div class="main-container">
+
+        <div class="glass-card">
+            <div class="header">
+                <h1>Downloader</h1>
+                <p style="color: var(--secondary-text); margin-top: 10px;">Download your favorite videos in highest
+                    quality</p>
+            </div>
+
+            <form id="download-form">
+                <div class="input-group">
+                    <input type="text" id="url-input" name="url" placeholder="Paste YouTube URL here..." required
+                        autocomplete="off">
+                </div>
+                <button type="submit" class="download-btn" id="download-btn">Download Video</button>
+                <div class="loader" id="loader">Processing download... please wait</div>
+            </form>
+        </div>
+
+        <div class="glass-card history-section">
+            <h2>Download History</h2>
+            <div class="video-list" id="video-list">
+                <!-- Items injected by JS -->
+            </div>
+        </div>
+
+    </div>
+
+    <div class="toast" id="toast">Notification</div>
+
+    <script src="/static/script.js"></script>
+</body>
+
+</html>
