@@ -21,6 +21,8 @@ class Video(Base):
     file_path = Column(String)
     downloaded_at = Column(DateTime, default=datetime.datetime.utcnow)
     is_deleted = Column(Boolean, default=False)
+    status = Column(String, default="pending")  # pending, processing, completed, failed
+    error_msg = Column(String, nullable=True)
 
 def init_db():
     Base.metadata.create_all(bind=engine)

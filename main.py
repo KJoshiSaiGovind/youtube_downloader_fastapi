@@ -35,12 +35,14 @@ async def home(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 @app.post("/download")
-async def download(
-    background_tasks: BackgroundTasks, 
-    url: str = Form(...), 
-    db: Session = Depends(get_db)
-):
-    # Use a safe filename template
+def process_video(video_id: int, url: str, db: Session):
+    video = db.query(Video).filter(Video.id == video_id).first()
+    if not video:
+        return
+
+    video.status = "processing"
+    db.commit()
+
     output_template = os.path.join(DOWNLOAD_DIR, "%(title)s.%(ext)s")
     
     ydl_opts = {
@@ -56,29 +58,49 @@ async def download(
     elif os.path.exists(os.path.join(BASE_DIR, "ffmpeg")):
         ydl_opts["ffmpeg_location"] = BASE_DIR
 
+    # Add cookies for authentication
+    cookies_path = os.path.join(BASE_DIR, "cookies.txt")
+    if os.path.exists(cookies_path):
+        ydl_opts["cookiefile"] = cookies_path
+
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=True)
             filename = ydl.prepare_filename(info)
             title = info.get('title', 'Unknown Title')
             
-            # Save to DB
-            new_video = Video(
-                title=title,
-                url=url,
-                file_path=filename,
-                downloaded_at=datetime.datetime.utcnow()
-            )
-            db.add(new_video)
+            # Update success
+            video.status = "completed"
+            video.title = title
+            video.file_path = filename
             db.commit()
-            db.refresh(new_video)
             
-            return JSONResponse({"status": "success", "message": "Download started", "video": {
-                "title": title,
-                "file_path": filename
-            }})
     except Exception as e:
-        return JSONResponse({"status": "error", "message": str(e)}, status_code=500)
+        # Update failure
+        video.status = "failed"
+        video.error_msg = str(e)
+        db.commit()
+
+@app.post("/download")
+async def download(
+    background_tasks: BackgroundTasks, 
+    url: str = Form(...), 
+    db: Session = Depends(get_db)
+):
+    # Create DB entry immediately
+    new_video = Video(
+        title="Processing...",
+        url=url,
+        status="pending"
+    )
+    db.add(new_video)
+    db.commit()
+    db.refresh(new_video)
+    
+    # Start background task
+    background_tasks.add_task(process_video, new_video.id, url, db)
+
+    return JSONResponse({"status": "success", "message": "Download started in background"})
 
 @app.get("/videos")
 async def get_videos(db: Session = Depends(get_db)):
@@ -91,7 +113,9 @@ async def get_videos(db: Session = Depends(get_db)):
         "url": v.url,
         "file_path": v.file_path,
         "downloaded_at": v.downloaded_at.isoformat(),
-        "is_deleted": v.is_deleted
+        "is_deleted": v.is_deleted,
+        "status": v.status,
+        "error_msg": v.error_msg
     } for v in videos]
 
 @app.post("/check_status")
